@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.green,
       ),
       home: const MyHomePage(title: 'Agriculture'),
     );
@@ -35,15 +35,19 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   Timer? timer;
-  String field1 = "10";
-  String field2 = "10";
-  String field3 = "10";
-  String field4 = "10";
+  String field1 = "loading...";
+  String field2 = "loading...";
+  String field3 = "loading...";
+  String field4 = "0.0";
   @override
   void initState() {
+    getThings();
     timer = Timer.periodic(Duration(seconds: 15), (Timer t) => getThings());
+    // getThings();
     super.initState();
   }
+
+  var isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -52,21 +56,94 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Center(
-        child: Container(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              const Text(
-                'Values from IOT',
-              ),
-              Text(
-                '$field1\n$field2\n$field3\n$field4',
-                style: Theme.of(context).textTheme.headline4,
-              ),
-            ],
-          ),
+        child: Padding(
+          padding: EdgeInsets.all(10),
+          child: isLoading
+              ? CircularProgressIndicator()
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  // mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    SizedBox(
+                      height: 60,
+                    ),
+                    const Text(
+                      'Values from Sensors',
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Humidity',
+                          style: Theme.of(context).textTheme.headline4,
+                        ),
+                        Text(
+                          field1,
+                          style: Theme.of(context).textTheme.headline4,
+                        )
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Temperature',
+                          style: Theme.of(context).textTheme.headline4,
+                        ),
+                        Text(
+                          field2,
+                          style: Theme.of(context).textTheme.headline4,
+                        )
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Moisture',
+                          style: Theme.of(context).textTheme.headline4,
+                        ),
+                        Text(
+                          field3,
+                          style: Theme.of(context).textTheme.headline4,
+                        )
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'pH',
+                          style: Theme.of(context).textTheme.headline4,
+                        ),
+                        Text(
+                          String.fromCharCode(
+                              (double.parse(field4.trim()).toInt())),
+                          style: Theme.of(context).textTheme.headline4,
+                        ),
+                      ],
+                    ),
+                    Expanded(child: Container())
+                    // Text(
+                    //   '$field1\n$field2\n$field3\n$field4',
+                    //   style: Theme.of(context).textTheme.headline4,
+                    // ),
+                  ],
+                ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          setState(() {
+            isLoading = true;
+          });
+          getThings();
+          // setState(() {});
+        },
+        child: Icon(Icons.restart_alt),
       ),
     );
   }
@@ -83,6 +160,7 @@ class _MyHomePageState extends State<MyHomePage> {
       field2 = things.feeds!.first.field2.toString();
       field3 = things.feeds!.first.field3.toString();
       field4 = things.feeds!.first.field4.toString();
+      isLoading = false;
     });
   }
 }
